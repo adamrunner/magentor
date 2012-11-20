@@ -84,6 +84,11 @@ module Magento
         
     end
     
+    def cache(method)
+      Base.connection.use_cache = true
+      send(method)
+    end
+
     def country
       Magento::Country.find_by_id(self.country_id)
     end

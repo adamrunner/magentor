@@ -1,10 +1,11 @@
 module Magento
   class Connection 
-    attr_accessor :session, :config, :logger
+    attr_accessor :session, :config, :logger, :use_cache
 
     def initialize(config = {})
       @logger ||= Logger.new(STDOUT)
       @config = config
+      @use_cache = false
       self
     end
 
@@ -30,7 +31,7 @@ module Magento
       end
 
       def cache?
-        !!config[:cache_store]
+        !!config[:cache_store] && use_cache
       end
 
       def call_without_caching(method = nil, *args)
@@ -49,6 +50,7 @@ module Magento
       end
 
       def call_with_caching(method = nil, *args)
+        self.use_cache = false
         config[:cache_store].fetch(cache_key(method, *args)) do
           call_without_caching(method, *args)
         end
